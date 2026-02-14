@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice Extractor | Saltify Export Tool</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+</head>
+<body class="bg-light">
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="#">SALTIFY EXPORT SYSTEM</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Upload</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Packing List</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Commercial Invoice</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- MAIN CONTAINER -->
+<div class="container my-5">
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <!-- Upload Card -->
+            <div class="card shadow-lg mb-4">
+                <div class="card-body">
+
+                    <h4 class="card-title mb-3 text-center">Upload Amazon Invoice</h4>
+
+                    <div class="mb-3">
+                        <label class="form-label">Select PDF File</label>
+                        <input type="file" class="form-control" id="pdfUpload" accept="application/pdf">
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Extracted Data Card -->
+            <div class="card shadow-lg">
+                <div class="card-body">
+
+                    <h4 class="card-title mb-4 text-center">Extracted Data</h4>
+
+                    <form id="invoiceForm">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Ship To</label>
+                                <input type="text" class="form-control" id="shipTo">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Order ID</label>
+                                <input type="text" class="form-control" id="orderId">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Order Date</label>
+                                <input type="text" class="form-control" id="orderDate">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Quantity</label>
+                                <input type="text" class="form-control" id="quantity">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Product Type</label>
+                                <input type="text" class="form-control" id="productType">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Shipping Address</label>
+                            <textarea class="form-control" id="shippingAddress" rows="3"></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Unit Price</label>
+                                <input type="text" class="form-control" id="unitPrice">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Item Subtotal</label>
+                                <input type="text" class="form-control" id="itemSubtotal">
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-3">
+                            <button type="button" onclick="goToInvoice()" class="btn btn-primary btn-lg">
+                                Generate Invoice PDF
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="script.js"></script>
+</body>
+</html>
