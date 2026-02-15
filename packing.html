@@ -22,7 +22,7 @@
     <div class="top-header">
         <div class="brand">SALTIFY</div>
     </div>
-
+    <div class="gold"></div>
     <div class="title">PACKING LIST</div>
 
     <!-- REFERENCE -->
@@ -34,8 +34,8 @@
     <br>
 
     <!-- SHIP FROM -->
-    <div>
-        <strong>Ships From</strong><br>
+    <div class="left">
+        <strong class="exporter">Ships From</strong><br>
         SALTIFY<br>
         Shop 6, Shri Hari Complex<br>
         Lakadganj, Nagpur, Maharashtra – 440008<br>
@@ -45,43 +45,48 @@
     <br>
 
     <!-- CONSIGNEE -->
-    <div>
-        <strong>Consignee</strong><br>
+    <div class="consignee">
+        <strong class="consignee_heading">Consignee</strong><br>
         <span id="p_address"></span>
     </div>
 
     <br>
 
-    <!-- DESCRIPTION -->
-    <div>
-        <strong>Description</strong><br>
-        Saltify 6x Bamboo Salt – <span id="p_productType"></span><br>
-        Package Dimensions (L x W x H): 18 x 10 x 5 cm<br>
-        1 Package<br>
-        Number of boxes: 1 Box<br>
-        Carrier: India Post<br>
-        Shipping Service: International Tracked Packet Service (ITPS)
-    </div>
 
-    <br>
 
     <!-- TABLE -->
     <table class="invoice-table">
-        <thead>
+        <thead class="table_dark">
             <tr>
-                <th>Quantity</th>
-                <th>Net Weight</th>
-                <th>Gross Weight</th>
+                <th class="text-white">Description</th>
+                <th class="text-white">Quantity</th>
+                <th class="text-white">Net Weight</th>
+                <th class="text-white">Gross Weight</th>
             </tr>
         </thead>
         <tbody>
             <tr>
+                <td> Saltify 6x Bamboo Salt – <span id="p_productType"></span></td>
                 <td id="p_quantity"></td>
                 <td>0.100 kg</td>
                 <td>0.196 kg</td>
             </tr>
         </tbody>
     </table>
+    <p class="package_dimension">Package Dimensions (L x W x H): 18 x 10 x 5 cm<br></p>
+
+
+        <!-- DESCRIPTION -->
+    <div class="consignee">
+        
+        
+        <strong class="consignee_heading">Shipment Information</strong><br>
+        1 Package<br>
+        Number of boxes: 1 Box<br>
+        Carrier: India Post<br>
+        Shipping Service: International Tracked Packet Service (ITPS)
+    </div>
+
 
     <!-- SIGNATURE -->
     <div class="signature">
