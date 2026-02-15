@@ -17,7 +17,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // If we are on invoice page
     if (document.getElementById("i_orderId")) {
         loadInvoiceData();
+         
     }
+    if (document.getElementById("p_date")) {
+        loadPackingData();
+    }
+        
 });
 
 async function extractText(file) {
@@ -101,6 +106,26 @@ function goToInvoice() {
     window.location.href = "invoice.html";
 }
 
+function goToPacking() {
+
+    const data = {
+        orderId: document.getElementById("orderId").value,
+        orderDate: document.getElementById("orderDate").value,
+        shipTo: document.getElementById("shipTo").value,
+        address: document.getElementById("shippingAddress").value,
+        quantity: document.getElementById("quantity").value,
+        unitPrice: document.getElementById("unitPrice").value,
+        subtotal: document.getElementById("itemSubtotal").value,
+        productType: document.getElementById("productType").value
+    };
+
+    // Save everything in same storage
+    localStorage.setItem("packingData", JSON.stringify(data));
+
+    // Redirect to packing page
+    window.location.href = "packing.html";
+}
+
 
 // =============================
 // LOAD DATA ON INVOICE PAGE
@@ -120,6 +145,19 @@ function loadInvoiceData() {
     document.getElementById("i_itemSubtotal").innerText = data.subtotal;
 }
 
+// load package data on packing slip page
+
+function loadPackingData() {
+
+    const data = JSON.parse(localStorage.getItem("packingData"));
+    if (!data) return;
+    console.log("Packing Data Loaded:", data);
+    document.getElementById("p_date").innerText = data.orderDate;
+    document.getElementById("p_address").innerText = data.address;
+    document.getElementById("p_quantity").innerText = data.quantity;
+    document.getElementById("p_productType").innerText = data.productType;
+}
+
 
 // =============================
 // DOWNLOAD PDF
@@ -136,4 +174,18 @@ function downloadPDF() {
     };
 
     html2pdf().set(opt).from(element).save();
+}
+
+
+function downloadPackingPDF() {
+
+    const element = document.getElementById("packing");
+
+    html2pdf().set({
+        margin: 0,
+        filename: 'Packing_List.pdf',
+        html2canvas: { scale: 2, scrollY: 0, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: [] }
+    }).from(element).save();
 }
