@@ -62,15 +62,31 @@ const orderId = text.match(/Order ID:\s*([\d\-]+)/)?.[1] || "";
 // Matches: Feb 7, 2026 inside the table artifact "Order Date: ","Sat, Feb 7, 2026
 const orderDate = text.match(/Order Date:[\s\S]*?([A-Za-z]{3}\s+\d{1,2},\s+\d{4})/)?.[1] || "";
 const shipTo = text.match(/Ship To:\s*\n([^\n]+)/)?.[1]?.trim() || "";
-let address = (text.match(/Ship To:\s*\n([\s\S]*?)Order ID:/)?.[1] || "")
-              .replace(/\n\s*\n/g, "\n")
-              .trim();
+
+
+// let address = (text.match(/Ship To:\s*\n([\s\S]*?)Order ID:/)?.[1] || "")
+//               .replace(/\n\s*\n/g, "\n")
+//               .trim();
+let rawAddress = (text.match(/Ship To:\s*\n([\s\S]*?)Order ID:/)?.[1] || "")
+                  .replace(/\n/g, " ")     // remove all line breaks
+                  .replace(/\s+/g, " ")    // remove extra spaces
+                  .trim();
+
+// Split words evenly into 2 lines
+let words = rawAddress.split(" ");
+let mid = Math.ceil(words.length / 2);
+
+let address = words.slice(0, mid).join(" ") + "\n" +
+              words.slice(mid).join(" ");
+
+
 const quantity = text.match(/\n(\d+)\s+Saltify/)?.[1] || "";
 const unitPrice = text.match(/\nCA\$([\d\.]+)/)?.[1] || "";
 // Matches: CA$11.00 which appears before "Item subtotal"
 const subtotal = text.match(/CA\$([\d\.]+)\s*[\r\n]*Item subtotal/)?.[1] || "";
 // Extracts (100 g) OR (250 g) OR (500 g)
 const producType = text.match(/\((\d+\s?g)\)/i)?.[1] || "";
+
 
     // Fill editable form
     document.getElementById("orderId").value = orderId;
