@@ -144,7 +144,12 @@ body {
     height: auto;
     margin-bottom: 5px;
 }
-
+.page_number{
+    position: absolute;
+    bottom: 10mm;
+    right: 15mm;
+    font-size: 12px;
+}
 /* PRINT SETTINGS */
 @page {
     size: A4;

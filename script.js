@@ -64,9 +64,9 @@ const orderDate = text.match(/Order Date:[\s\S]*?([A-Za-z]{3}\s+\d{1,2},\s+\d{4}
 const shipTo = text.match(/Ship To:\s*\n([^\n]+)/)?.[1]?.trim() || "";
 
 
-// let address = (text.match(/Ship To:\s*\n([\s\S]*?)Order ID:/)?.[1] || "")
-//               .replace(/\n\s*\n/g, "\n")
-//               .trim();
+let address = (text.match(/Ship To:\s*\n([\s\S]*?)Order ID:/)?.[1] || "")
+              .replace(/\n\s*\n/g, "\n")
+              .trim();
 let rawAddress = (text.match(/Ship To:\s*\n([\s\S]*?)Order ID:/)?.[1] || "")
                   .replace(/\n/g, " ")     // remove all line breaks
                   .replace(/\s+/g, " ")    // remove extra spaces
@@ -76,8 +76,8 @@ let rawAddress = (text.match(/Ship To:\s*\n([\s\S]*?)Order ID:/)?.[1] || "")
 let words = rawAddress.split(" ");
 let mid = Math.ceil(words.length / 2);
 
-let address = words.slice(0, mid).join(" ") + "\n" +
-              words.slice(mid).join(" ");
+// let address = words.slice(0, mid).join(" ") + "\n" +
+//               words.slice(mid).join(" ");
 
 
 const quantity = text.match(/\n(\d+)\s+Saltify/)?.[1] || "";
@@ -89,6 +89,7 @@ const producType = text.match(/\((\d+\s?g)\)/i)?.[1] || "";
 
 
     // Fill editable form
+    document.getElementById("invoiceNo").value = "SALT-EXP-CA-26-010";
     document.getElementById("orderId").value = orderId;
     document.getElementById("orderDate").value = orderDate;
     document.getElementById("shipTo").value = shipTo;
@@ -107,6 +108,7 @@ const producType = text.match(/\((\d+\s?g)\)/i)?.[1] || "";
 function goToInvoice() {
 
     const data = {
+        invoiceNo: document.getElementById("invoiceNo").value,
         orderId: document.getElementById("orderId").value,
         orderDate: document.getElementById("orderDate").value,
         shipTo: document.getElementById("shipTo").value,
@@ -125,6 +127,7 @@ function goToInvoice() {
 function goToPacking() {
 
     const data = {
+        invoiceNo: document.getElementById("invoiceNo").value,
         orderId: document.getElementById("orderId").value,
         orderDate: document.getElementById("orderDate").value,
         shipTo: document.getElementById("shipTo").value,
@@ -151,7 +154,8 @@ function loadInvoiceData() {
 
     const data = JSON.parse(localStorage.getItem("invoiceData"));
     if (!data) return;
-
+    
+    document.getElementById("i_invoiceNo").innerText = data.invoiceNo;
     document.getElementById("i_orderId").innerText = data.orderId;
     document.getElementById("i_orderDate").innerText = data.orderDate;
     // document.getElementById("i_shipTo").innerText = data.shipTo;
@@ -168,6 +172,7 @@ function loadPackingData() {
     const data = JSON.parse(localStorage.getItem("packingData"));
     if (!data) return;
     console.log("Packing Data Loaded:", data);
+    document.getElementById("p_invoiceNo").innerText = data.invoiceNo;
     document.getElementById("p_date").innerText = data.orderDate;
     document.getElementById("p_address").innerText = data.address;
     document.getElementById("p_quantity").innerText = data.quantity;
@@ -180,10 +185,10 @@ function loadPackingData() {
 // =============================
 function downloadPDF() {
     const element = document.getElementById("invoice");
-
+    const invoice_number = document.getElementById("i_invoiceNo").innerText || "Invoice";
     const opt = {
         margin: 0,
-        filename: 'Commercial_Export_Invoice.pdf',
+        filename: `${invoice_number}_invoice.pdf`,
         image: { type: 'jpeg', quality: 1 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -196,10 +201,11 @@ function downloadPDF() {
 function downloadPackingPDF() {
 
     const element = document.getElementById("packing");
+    const invoice_number = document.getElementById("p_invoiceNo").innerText || "Packing_List";
 
     html2pdf().set({
         margin: 0,
-        filename: 'Packing_List.pdf',
+        filename: `${invoice_number}_packing_list.pdf`,
         html2canvas: { scale: 2, scrollY: 0, useCORS: true },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: [] }
