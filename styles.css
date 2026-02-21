@@ -35,7 +35,7 @@ body {
 .top-header {
     padding: 2rem;
     font-weight: bold;
-    background-color: #305126;
+    background-color: #1e392d;
 }
 
 .brand {
@@ -44,8 +44,8 @@ body {
     color: white;
 }
 .gold{
-    height: 0.5rem;
-    background-color: gold;
+    height: 0.35rem;
+    background-color: #c7a139;
 }
 
 .title {
@@ -112,13 +112,13 @@ body {
 }
 
 .table_dark{
-    background-color: #305126;
+    background-color: #1e392d;
 }
 /* TOTALS */
 .totals {
     padding-left: 3rem;
-    display: flex;
-    justify-content: space-between;
+    /* display: flex; */
+    /* justify-content: space-between; */
     margin-top: 12px;
     font-weight: bold;
 }

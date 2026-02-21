@@ -98,6 +98,14 @@ const producType = text.match(/\((\d+\s?g)\)/i)?.[1] || "";
     document.getElementById("unitPrice").value = unitPrice;
     document.getElementById("itemSubtotal").value = subtotal;
     document.getElementById("productType").value = producType;
+    const productOptions = {
+        "100 g": { dimension: "18 x 10 x 5 cm", net: 0.1, gross: 0.196 },
+        "250 g": { dimension: "18 x 10 x 11 cm", net: 0.25, gross: 0.38 },
+        "500 g": { dimension: "18 x 10 x 11 cm", net: 0.5, gross: 0.65 },
+    };
+    document.getElementById("dimension").value = productOptions[producType]?.dimension || "1";
+    document.getElementById("netWeight").value = productOptions[producType]?.net || "1";
+    document.getElementById("grossWeight").value = productOptions[producType]?.gross || "1";
 }
 
 
@@ -116,7 +124,10 @@ function goToInvoice() {
         quantity: document.getElementById("quantity").value,
         unitPrice: document.getElementById("unitPrice").value,
         subtotal: document.getElementById("itemSubtotal").value,
-        productType: document.getElementById("productType").value
+        productType: document.getElementById("productType").value,
+        dimension: document.getElementById("dimension").value,
+        netWeight: document.getElementById("netWeight").value,
+        grossWeight: document.getElementById("grossWeight").value
     };
 
     localStorage.setItem("invoiceData", JSON.stringify(data));
@@ -135,7 +146,10 @@ function goToPacking() {
         quantity: document.getElementById("quantity").value,
         unitPrice: document.getElementById("unitPrice").value,
         subtotal: document.getElementById("itemSubtotal").value,
-        productType: document.getElementById("productType").value
+        productType: document.getElementById("productType").value,
+        dimension: document.getElementById("dimension").value,
+        netWeight: document.getElementById("netWeight").value,
+        grossWeight: document.getElementById("grossWeight").value
     };
 
     // Save everything in same storage
@@ -163,6 +177,9 @@ function loadInvoiceData() {
     document.getElementById("i_quantity").innerText = data.quantity;
     document.getElementById("i_unitPrice").innerText = data.unitPrice;
     document.getElementById("i_itemSubtotal").innerText = data.subtotal;
+    // document.getElementById("i_dimension").textContent = data.dimension;
+    document.getElementById("i_netWeight").innerText = data.netWeight;
+    document.getElementById("i_grossWeight").innerText = data.grossWeight;
 }
 
 // load package data on packing slip page
@@ -177,6 +194,9 @@ function loadPackingData() {
     document.getElementById("p_address").innerText = data.address;
     document.getElementById("p_quantity").innerText = data.quantity;
     document.getElementById("p_productType").innerText = data.productType;
+    document.getElementById("p_dimension").innerText = data.dimension;
+    document.getElementById("p_netWeight").innerText = data.netWeight;
+    document.getElementById("p_grossWeight").innerText = data.grossWeight;
 }
 
 
@@ -188,7 +208,7 @@ function downloadPDF() {
     const invoice_number = document.getElementById("i_invoiceNo").innerText || "Invoice";
     const opt = {
         margin: 0,
-        filename: `${invoice_number}_invoice.pdf`,
+        filename: `${invoice_number}_Invoice.pdf`,
         image: { type: 'jpeg', quality: 1 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -205,7 +225,7 @@ function downloadPackingPDF() {
 
     html2pdf().set({
         margin: 0,
-        filename: `${invoice_number}_packing_list.pdf`,
+        filename: `${invoice_number}_PackingList.pdf`,
         html2canvas: { scale: 2, scrollY: 0, useCORS: true },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: [] }
