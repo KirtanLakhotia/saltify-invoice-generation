@@ -36,7 +36,7 @@
             <strong>Invoice No:</strong> <span id="i_invoiceNo"></span> <br>
             <strong>Date:</strong> <span id="i_orderDate"></span><br>
             <strong>Amazon Order ID:</strong> <span id="i_orderId"></span><br>
-            <strong>Currency:</strong> CAD
+            <strong>Currency:</strong> <span class="i_currency"></span><br>
         </div>
         <div class="left">
             <strong class="exporter">Exporter</strong><br>
@@ -65,8 +65,8 @@
                 <th class="text-white">Description</th>
                 <th class="text-white">HS Code</th>
                 <th class="text-white">Qty</th>
-                <th class="text-white">Unit (CAD)</th>
-                <th class="text-white">Total (CAD)</th>
+                <th class="text-white">Unit (<span class="i_currency"></span>)</th>
+                <th class="text-white">Total (<span class="i_currency"></span>)</th>
             </tr>
         </thead>
         <tbody>
@@ -79,7 +79,7 @@
                 <td>25010090</td>
                 <td id="i_quantity"></td>
                 <td id="i_unitPrice"></td>
-                <td id="i_itemSubtotal"></td>
+                <td class="i_itemSubtotal"></td>
             </tr>
         </tbody>
     </table>
@@ -88,7 +88,7 @@
 <div class="totals">    
     Net Weight: <span id="i_netWeight"></span><br>
     Gross Weight: <span id="i_grossWeight"></span><br>
-    Total Invoice Value: CAD <span id="i_itemSubtotal"></span>
+    Total Invoice Value: <span class="i_currency"></span> <span class="i_itemSubtotal"></span>
 </div>
 
     <!-- DECLARATION -->

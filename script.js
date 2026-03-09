@@ -56,15 +56,164 @@ async function extractText(file) {
 // PARSE AMAZON DATA
 // =============================
 
+
+
+/**
+ * Maps a country name or address string to its 3-letter currency code.
+ * Generalized to handle lowercase conversions and edge cases.
+ */
+function getCurrencyByCountry(addressString) {
+    if (!addressString) return "USD"; // Safe default
+
+    // Lowercase the input to handle "CANADA", "Canada", or "canada" seamlessly
+    const normalizedText = addressString.toLowerCase().trim();
+
+    // Mapping of major ecommerce countries and variations to their currencies
+    const currencyMap = {
+        // North America
+        "canada": "CAD",
+        "united states": "USD",
+        "united states of america": "USD",
+        "usa": "USD",
+        "us": "USD",
+        "mexico": "MXN",
+
+        // Europe (Non-Euro)
+        "united kingdom": "GBP",
+        "uk": "GBP",
+        "great britain": "GBP",
+        "switzerland": "CHF",
+        "sweden": "SEK",
+        "norway": "NOK",
+        "denmark": "DKK",
+
+        // Eurozone
+        "germany": "EUR",
+        "france": "EUR",
+        "italy": "EUR",
+        "spain": "EUR",
+        "netherlands": "EUR",
+        "belgium": "EUR",
+        "ireland": "EUR",
+        "austria": "EUR",
+
+        // Asia / Pacific
+        "australia": "AUD",
+        "new zealand": "NZD",
+        "japan": "JPY",
+        "china": "CNY",
+        "india": "INR",
+        "south korea": "KRW",
+        "singapore": "SGD",
+        "hong kong": "HKD",
+
+        // Middle East / Africa
+        "united arab emirates": "AED",
+        "uae": "AED",
+        "saudi arabia": "SAR",
+        "south africa": "ZAR",
+
+        // South America
+        "brazil": "BRL",
+        "argentina": "ARS",
+        "colombia": "COP"
+    };
+
+    // Edge Case Handling: Loop through the keys and check if the normalized text 
+    // *contains* the country name. This prevents failures if the OCR merged 
+    // the country with a zip code (e.g., "v5v 3c3 canada").
+    for (const [country, currency] of Object.entries(currencyMap)) {
+        // Using regex boundaries \b so "us" doesn't match the letters inside "australia"
+        const regex = new RegExp(`\\b${country}\\b`, "i");
+        if (regex.test(normalizedText)) {
+            return currency;
+        }
+    }
+
+    // Default fallback if no recognized country is found
+    return "USD"; 
+}
+
+// function parseData(text) {
+
+    
+// const orderId = text.match(/Order ID:\s*([\d\-]+)/)?.[1] || "";
+// // Matches: Feb 7, 2026 inside the table artifact "Order Date: ","Sat, Feb 7, 2026
+// const orderDate = text.match(/Order Date:[\s\S]*?([A-Za-z]{3}\s+\d{1,2},\s+\d{4})/)?.[1] || "";
+// const shipTo = text.match(/Ship To:\s*\n([^\n]+)/)?.[1]?.trim() || "";
+
+
+// let address = (text.match(/Ship To:\s*\n([\s\S]*?)Order ID:/)?.[1] || "")
+//               .replace(/\n\s*\n/g, "\n")
+//               .trim();
+// let rawAddress = (text.match(/Ship To:\s*\n([\s\S]*?)Order ID:/)?.[1] || "")
+//                   .replace(/\n/g, " ")     // remove all line breaks
+//                   .replace(/\s+/g, " ")    // remove extra spaces
+//                   .trim();
+
+// // Split words evenly into 2 lines
+// let words = rawAddress.split(" ");
+// let mid = Math.ceil(words.length / 2);
+
+// // let address = words.slice(0, mid).join(" ") + "\n" +
+// //               words.slice(mid).join(" ");
+
+
+// const quantity = text.match(/\n(\d+)\s+Saltify/)?.[1] || "";
+// const unitPrice = text.match(/\nCA\$([\d\.]+)/)?.[1] || "";
+// // Matches: CA$11.00 which appears before "Item subtotal"
+// const subtotal = text.match(/CA\$([\d\.]+)\s*[\r\n]*Item subtotal/)?.[1] || "";
+// // Extracts (100 g) OR (250 g) OR (500 g)
+// const producType = text.match(/\((\d+\s?g)\)/i)?.[1] || "";
+
+
+//     // Fill editable form
+//     document.getElementById("invoiceNo").value = "SALT-EXP-CA-26-010";
+//     document.getElementById("orderId").value = orderId;
+//     document.getElementById("orderDate").value = orderDate;
+//     document.getElementById("shipTo").value = shipTo;
+//     document.getElementById("shippingAddress").value = address;
+//     document.getElementById("quantity").value = quantity;
+//     document.getElementById("unitPrice").value = unitPrice;
+//     document.getElementById("itemSubtotal").value = subtotal;
+//     document.getElementById("productType").value = producType;
+//     const productOptions = {
+//         "100 g": { dimension: "18 x 10 x 5 cm", net: 0.1, gross: 0.196 },
+//         "250 g": { dimension: "18 x 10 x 11 cm", net: 0.25, gross: 0.38 },
+//         "500 g": { dimension: "18 x 10 x 11 cm", net: 0.5, gross: 0.65 },
+//     };
+//     document.getElementById("dimension").value = productOptions[producType]?.dimension || "1";
+//     document.getElementById("netWeight").value = productOptions[producType]?.net || "1";
+//     document.getElementById("grossWeight").value = productOptions[producType]?.gross || "1";
+// }
+
 function parseData(text) {
+    // 1. Order ID
+    const orderIdMatch = text.match(/Order ID:\s*([\d\-]+)/i);
+    const orderId = orderIdMatch ? orderIdMatch[1] : "";
 
-const orderId = text.match(/Order ID:\s*([\d\-]+)/)?.[1] || "";
-// Matches: Feb 7, 2026 inside the table artifact "Order Date: ","Sat, Feb 7, 2026
-const orderDate = text.match(/Order Date:[\s\S]*?([A-Za-z]{3}\s+\d{1,2},\s+\d{4})/)?.[1] || "";
-const shipTo = text.match(/Ship To:\s*\n([^\n]+)/)?.[1]?.trim() || "";
+    // 2. Order Date (Matches standard Month DD, YYYY anywhere in the text)
+    const orderDateMatch = text.match(/(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2},\s+\d{4}/i);
+    const orderDate = orderDateMatch ? orderDateMatch[0] : "";
 
 
-let address = (text.match(/Ship To:\s*\n([\s\S]*?)Order ID:/)?.[1] || "")
+    // let address = "";
+    // // Captures the block between "Ship To:" and "Order ID:" (or "Amazon")
+    // const addressBlockMatch = text.match(/Ship To:\s*\n([\s\S]*?)(?:Order ID:|Amazon\b)/i);
+    // if (addressBlockMatch) {
+    //     let addressLines = addressBlockMatch[1].split('\n')
+    //         .map(line => line.trim())
+    //         .filter(line => line.length > 0);
+        
+    //     if (addressLines.length > 0) {
+    //         shipTo = addressLines.shift(); // The first line is always the Name
+    //     }
+    //     // Join the remaining lines into a clean, single-line address
+    //     address = addressLines.join(" ");
+    // }
+    
+
+    let address = (text.match(/Ship To:\s*\n([\s\S]*?)Order ID:/)?.[1] || "")
               .replace(/\n\s*\n/g, "\n")
               .trim();
 let rawAddress = (text.match(/Ship To:\s*\n([\s\S]*?)Order ID:/)?.[1] || "")
@@ -76,39 +225,60 @@ let rawAddress = (text.match(/Ship To:\s*\n([\s\S]*?)Order ID:/)?.[1] || "")
 let words = rawAddress.split(" ");
 let mid = Math.ceil(words.length / 2);
 
-// let address = words.slice(0, mid).join(" ") + "\n" +
-//               words.slice(mid).join(" ");
+
+    // 4. Quantity (Checks table format or plain text format)
+    const qtyMatch = text.match(/"?(\d+)\s*"?\s*,\s*"?Saltify/i) || text.match(/\n(\d+)\s+Saltify/i);
+    const quantity = qtyMatch ? qtyMatch[1] : "1";
+
+    // 5. Product Type (Handles split lines and US oz conversions)
+    // Looks for the number immediately following "Powdered ("
+    const weightMatch = text.match(/Powdered\s*\(\s*(\d+)/i);
+    const weightNum = weightMatch ? weightMatch[1] : "100";
+    const producType = `${weightNum} g`; // Reconstructs cleanly to match your dictionary keys
+
+    // 6. Unit Price (Handles CA$ and US$)
+    const unitPriceMatch = text.match(/"(?:CA)?\$([\d\.]+)\s*"/i) || text.match(/(?:CA)?\$([\d\.]+)/i);
+    const unitPrice = unitPriceMatch ? unitPriceMatch[1] : "";
+
+    // 7. Item Subtotal
+    let subtotalMatch = text.match(/Item subtotal\s*(?:CA)?\$([\d\.]+)/i) ||
+                        text.match(/(?:CA)?\$([\d\.]+)\s*[\r\n]*Item subtotal/i) ||
+                        text.match(/"Item subtotal[\s\S]*?"\s*,\s*"(?:CA)?\$([\d\.]+)/i);
+    let subtotal = subtotalMatch ? subtotalMatch[1] : "";
+    
+    // Mathematical fallback: If table layout hides the subtotal, calculate it
+    if (!subtotal && unitPrice && quantity) {
+        subtotal = (parseFloat(unitPrice) * parseInt(quantity, 10)).toFixed(2);
+    }
 
 
-const quantity = text.match(/\n(\d+)\s+Saltify/)?.[1] || "";
-const unitPrice = text.match(/\nCA\$([\d\.]+)/)?.[1] || "";
-// Matches: CA$11.00 which appears before "Item subtotal"
-const subtotal = text.match(/CA\$([\d\.]+)\s*[\r\n]*Item subtotal/)?.[1] || "";
-// Extracts (100 g) OR (250 g) OR (500 g)
-const producType = text.match(/\((\d+\s?g)\)/i)?.[1] || "";
+    // Extract Currency using the new mapping!
+    const currencyCode = getCurrencyByCountry(rawAddress);
 
-
-    // Fill editable form
-    document.getElementById("invoiceNo").value = "SALT-EXP-CA-26-010";
+    // 8. Fill editable form
+    document.getElementById("invoiceNo").value = "SALT-EXP-CA-26-010"; 
     document.getElementById("orderId").value = orderId;
     document.getElementById("orderDate").value = orderDate;
-    document.getElementById("shipTo").value = shipTo;
+    // document.getElementById("shipTo").value = shipTo;
     document.getElementById("shippingAddress").value = address;
     document.getElementById("quantity").value = quantity;
     document.getElementById("unitPrice").value = unitPrice;
     document.getElementById("itemSubtotal").value = subtotal;
     document.getElementById("productType").value = producType;
+    document.getElementById("currency").value = currencyCode; // Default to CAD, can be adjusted based on unit price extraction
+
     const productOptions = {
         "100 g": { dimension: "18 x 10 x 5 cm", net: 0.1, gross: 0.196 },
         "250 g": { dimension: "18 x 10 x 11 cm", net: 0.25, gross: 0.38 },
         "500 g": { dimension: "18 x 10 x 11 cm", net: 0.5, gross: 0.65 },
     };
-    document.getElementById("dimension").value = productOptions[producType]?.dimension || "1";
-    document.getElementById("netWeight").value = productOptions[producType]?.net || "1";
-    document.getElementById("grossWeight").value = productOptions[producType]?.gross || "1";
+    
+    // Map the cleaned product type to your dictionary
+    const options = productOptions[producType] || productOptions["100 g"];
+    document.getElementById("dimension").value = options.dimension;
+    document.getElementById("netWeight").value = options.net;
+    document.getElementById("grossWeight").value = options.gross;
 }
-
-
 // =============================
 // GO TO INVOICE PAGE
 // =============================
@@ -119,7 +289,7 @@ function goToInvoice() {
         invoiceNo: document.getElementById("invoiceNo").value,
         orderId: document.getElementById("orderId").value,
         orderDate: document.getElementById("orderDate").value,
-        shipTo: document.getElementById("shipTo").value,
+        // shipTo: document.getElementById("shipTo").value,
         address: document.getElementById("shippingAddress").value,
         quantity: document.getElementById("quantity").value,
         unitPrice: document.getElementById("unitPrice").value,
@@ -127,7 +297,8 @@ function goToInvoice() {
         productType: document.getElementById("productType").value,
         dimension: document.getElementById("dimension").value,
         netWeight: document.getElementById("netWeight").value,
-        grossWeight: document.getElementById("grossWeight").value
+        grossWeight: document.getElementById("grossWeight").value,
+        currency: document.getElementById("currency").value
     };
 
     localStorage.setItem("invoiceData", JSON.stringify(data));
@@ -141,7 +312,7 @@ function goToPacking() {
         invoiceNo: document.getElementById("invoiceNo").value,
         orderId: document.getElementById("orderId").value,
         orderDate: document.getElementById("orderDate").value,
-        shipTo: document.getElementById("shipTo").value,
+        // shipTo: document.getElementById("shipTo").value,
         address: document.getElementById("shippingAddress").value,
         quantity: document.getElementById("quantity").value,
         unitPrice: document.getElementById("unitPrice").value,
@@ -149,7 +320,8 @@ function goToPacking() {
         productType: document.getElementById("productType").value,
         dimension: document.getElementById("dimension").value,
         netWeight: document.getElementById("netWeight").value,
-        grossWeight: document.getElementById("grossWeight").value
+        grossWeight: document.getElementById("grossWeight").value,
+        currency: document.getElementById("currency").value
     };
 
     // Save everything in same storage
@@ -176,10 +348,16 @@ function loadInvoiceData() {
     document.getElementById("i_address").innerText = data.address;
     document.getElementById("i_quantity").innerText = data.quantity;
     document.getElementById("i_unitPrice").innerText = data.unitPrice;
-    document.getElementById("i_itemSubtotal").innerText = data.subtotal;
+    document.querySelectorAll(".i_itemSubtotal").forEach(el => {
+        el.innerText = data.subtotal;
+    });
     // document.getElementById("i_dimension").textContent = data.dimension;
     document.getElementById("i_netWeight").innerText = data.netWeight;
     document.getElementById("i_grossWeight").innerText = data.grossWeight;
+    // document.getElementById("i_currency").innerText = data.currency;
+    document.querySelectorAll(".i_currency").forEach(el => {
+     el.textContent = data.currency;
+});
 }
 
 // load package data on packing slip page
@@ -197,6 +375,7 @@ function loadPackingData() {
     document.getElementById("p_dimension").innerText = data.dimension;
     document.getElementById("p_netWeight").innerText = data.netWeight;
     document.getElementById("p_grossWeight").innerText = data.grossWeight;
+    document.getElementById("p_currency").innerText = data.currency;
 }
 
 
