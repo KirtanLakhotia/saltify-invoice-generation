@@ -2,6 +2,8 @@
 // PDF EXTRACTION
 // =============================
 
+// const { Console } = require("console");
+
 document.addEventListener("DOMContentLoaded", function () {
 
     const upload = document.getElementById("pdfUpload");
@@ -312,7 +314,7 @@ function fillForm(data) {
 
 async function parseData(text) {
 
-    const API_KEY = "AIzaSyAze1ChpdjLASBUXezF6GhqnSj87AlZeXQ";
+    const API_KEY = "AIzaSyCGpDVqFYVXattDUBFhTYgToVonPQMAUWM";
 
     const prompt = `
 You are an invoice parser.
@@ -332,6 +334,7 @@ currency
 
 Rules:
 - If a field is missing return ""
+- shipping address should not be in one ine keep it like given in the text.
 - productType should be like "100 g", "250 g", "500 g"
 - currency should be 3 letter code (USD, CAD, INR, EUR) and respectively for other countries.
 - Return JSON only.
@@ -339,7 +342,7 @@ Rules:
 Text:
 ${text}
 `;
-
+    console.log("Prompt sent to Gemini:", prompt);
     const response = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`,
         {
@@ -358,7 +361,7 @@ ${text}
             })
         }
     );
-
+    console.log("Raw API Response:", response);
     const data = await response.json();
 
     let aiText = data.candidates[0].content.parts[0].text;
