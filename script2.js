@@ -334,7 +334,7 @@ currency
 
 Rules:
 - If a field is missing return ""
-- shipping address should not be in one ine keep it like given in the text.
+- shipping address should not be in one line keep it like given in the text also dont leave next line blank. 
 - productType should be like "100 g", "250 g", "500 g"
 - currency should be 3 letter code (USD, CAD, INR, EUR) and respectively for other countries.
 - Return JSON only.
